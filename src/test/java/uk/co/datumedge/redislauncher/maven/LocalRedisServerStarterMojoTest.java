@@ -17,14 +17,34 @@ import uk.co.datumedge.redislauncher.RedisServer;
 public class LocalRedisServerStarterMojoTest {
 	private final Mockery context = new JUnit4Mockery();
 	private final RedisServer redisServer = context.mock(RedisServer.class);
+	private final LocalRedisServerStarterMojo mojo = new LocalRedisServerStarterMojo();
+
+	public LocalRedisServerStarterMojoTest() {
+		mojo.setRedisServer(redisServer);
+	}
 
 	@Test
 	public void startsLocalRedisServer() throws MojoExecutionException, MojoFailureException, IOException, InterruptedException {
-		LocalRedisServerStarterMojo mojo = new LocalRedisServerStarterMojo();
-		mojo.setRedisServer(redisServer);
-
 		context.checking(new Expectations() {{
 			oneOf(redisServer).start();
+		}});
+
+		mojo.execute();
+	}
+
+	@Test(expected=MojoExecutionException.class)
+	public void throwsMojoExecutionExceptionWhenRedisServerThrowsIOException() throws MojoExecutionException, MojoFailureException, IOException, InterruptedException {
+		context.checking(new Expectations() {{
+			oneOf(redisServer).start(); will(throwException(new IOException()));
+		}});
+
+		mojo.execute();
+	}
+
+	@Test(expected=MojoExecutionException.class)
+	public void throwsMojoExecutionExceptionWhenRedisServerThrowsInterruptedException() throws MojoExecutionException, MojoFailureException, IOException, InterruptedException {
+		context.checking(new Expectations() {{
+			oneOf(redisServer).start(); will(throwException(new InterruptedException()));
 		}});
 
 		mojo.execute();

@@ -19,11 +19,9 @@ public class LocalRedisServerStarterMojo extends AbstractMojo {
 		try {
 			redisServer.start();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MojoExecutionException("Redis server could not be started", e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MojoExecutionException("Redis server could not be started", e);
 		}
 	}
 
