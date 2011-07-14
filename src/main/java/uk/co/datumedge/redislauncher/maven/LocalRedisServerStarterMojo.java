@@ -12,10 +12,12 @@ import uk.co.datumedge.redislauncher.RedisServer;
  * @goal start
  */
 public class LocalRedisServerStarterMojo extends AbstractMojo {
+	private RedisServer redisServer;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			RedisServer.newInstance().start();
+			redisServer.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -23,5 +25,9 @@ public class LocalRedisServerStarterMojo extends AbstractMojo {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void setRedisServer(RedisServer redisServer) {
+		this.redisServer = redisServer;
 	}
 }

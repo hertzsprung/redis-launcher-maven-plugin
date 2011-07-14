@@ -1,27 +1,32 @@
 package uk.co.datumedge.redislauncher.maven;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JMock;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import redis.clients.jedis.Jedis;
+import uk.co.datumedge.redislauncher.RedisServer;
 
+@RunWith(JMock.class)
 public class LocalRedisServerStarterMojoTest {
+	private final Mockery context = new JUnit4Mockery();
+	private final RedisServer redisServer = context.mock(RedisServer.class);
+
 	@Test
-	public void startsLocalRedisServer() throws MojoExecutionException, MojoFailureException {
-		Jedis jedis = null;
-		try {
-			new LocalRedisServerStarterMojo().execute();
-			jedis = new Jedis("localhost");
-			assertThat(jedis.ping(), is("PONG"));
-		} finally {
-			if (jedis != null) {
-				jedis.shutdown();
-				jedis.disconnect();
-			}
-		}
+	public void startsLocalRedisServer() throws MojoExecutionException, MojoFailureException, IOException, InterruptedException {
+		LocalRedisServerStarterMojo mojo = new LocalRedisServerStarterMojo();
+		mojo.setRedisServer(redisServer);
+
+		context.checking(new Expectations() {{
+			oneOf(redisServer).start();
+		}});
+
+		mojo.execute();
 	}
 }
